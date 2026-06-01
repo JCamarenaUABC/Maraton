@@ -1,0 +1,644 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Aprende SQL - Escuela Interactiva</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .query-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .query-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .query-title .badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.7em;
+        }
+
+        .sql-editor {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .sql-code {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            padding: 10px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .result th, .result td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .result th {
+            background: #667eea;
+            color: white;
+        }
+
+        .correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .tables-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .table-preview {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .table-preview h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Aprende SQL con la Escuela</h1>
+        <div class="subtitle">Ejercicios interactivos de consultas SQL | Base de datos escolar</div>
+
+        <!-- Base de datos visual -->
+        <div class="dashboard">
+            <div class="card">
+                <h2>📊 Tablas de la Base de Datos</h2>
+                <div class="tables-preview" id="tableStructure"></div>
+            </div>
+            <div class="card">
+                <h2>📝 Datos de Ejemplo</h2>
+                <div id="sampleData"></div>
+            </div>
+        </div>
+
+        <!-- Ejercicio 1: EXISTS básico -->
+        <div class="query-section" id="exercise1">
+            <div class="query-title">
+                <span class="badge">Ejercicio 1</span>
+                Entendiendo EXISTS
+            </div>
+            <div class="sql-editor">
+                <pre>SELECT * FROM #products WHERE EXISTS(SELECT dato FROM #datoAbuscar)</pre>
+            </div>
+            <div class="input-group">
+                <label>📌 ¿Qué hace esta consulta?</label>
+                <select id="q1_select">
+                    <option value="">Selecciona una respuesta...</option>
+                    <option value="correct">Devuelve todos los productos porque la subconsulta siempre es verdadera</option>
+                    <option value="wrong1">Solo devuelve los productos que coinciden con 'X'</option>
+                    <option value="wrong2">Devuelve un error porque no hay relación entre tablas</option>
+                    <option value="wrong3">Devuelve solo el producto 'X'</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>🔧 Completa el query para buscar productos que estén en #datoAbuscar:</label>
+                <textarea id="q1_fix" rows="3" class="sql-code" placeholder="Escribe el SQL correcto aquí..."></textarea>
+            </div>
+            <button onclick="checkExercise1()">✓ Verificar respuestas</button>
+            <div id="result1" class="result"></div>
+        </div>
+
+        <!-- Ejercicio 2: INNER JOIN -->
+        <div class="query-section" id="exercise2">
+            <div class="query-title">
+                <span class="badge">Ejercicio 2</span>
+                Uniendo tablas
+            </div>
+            <div class="sql-editor">
+                <pre>-- Mostrar alumnos con sus materias y calificaciones
+SELECT a.Nombre, m.NombreMateria, i.CalificacionFinal
+FROM Alumnos a
+___ JOIN Inscripciones i ON a.AlumnoID = i.AlumnoID
+___ JOIN Grupos g ON i.GrupoID = g.GrupoID
+___ JOIN Materias m ON g.MateriaID = m.MateriaID</pre>
+            </div>
+            <div class="input-group">
+                <label>📌 ¿Qué tipo de JOIN se debe usar y por qué?</label>
+                <input type="text" id="q2_explain" placeholder="Explica qué JOIN usarías y por qué..." style="width: 100%; padding: 10px;">
+            </div>
+            <div class="input-group">
+                <label>✏️ Completa las palabras faltantes (INNER, LEFT, RIGHT, FULL):</label>
+                <input type="text" id="q2_fill1" placeholder="Primer JOIN" style="width: 30%; margin-right: 10px;">
+                <input type="text" id="q2_fill2" placeholder="Segundo JOIN" style="width: 30%; margin-right: 10px;">
+                <input type="text" id="q2_fill3" placeholder="Tercer JOIN" style="width: 30%;">
+            </div>
+            <button onclick="checkExercise2()">✓ Verificar respuestas</button>
+            <div id="result2" class="result"></div>
+        </div>
+
+        <!-- Ejercicio 3: Subconsulta con EXISTS -->
+        <div class="query-section" id="exercise3">
+            <div class="query-title">
+                <span class="badge">Ejercicio 3</span>
+                EXISTS con relación real
+            </div>
+            <div class="sql-editor">
+                <pre>-- Buscar alumnos que tengan calificación mayor a 90
+SELECT * FROM Alumnos a
+WHERE ___ (
+    SELECT 1 FROM Inscripciones i
+    ___ Grupos g ON i.GrupoID = g.GrupoID
+    WHERE i.AlumnoID = a.AlumnoID 
+    ___ i.CalificacionFinal > 90
+)</pre>
+            </div>
+            <div class="input-group">
+                <label>📌 ¿Qué devuelve este query?</label>
+                <select id="q3_select">
+                    <option value="">Selecciona una respuesta...</option>
+                    <option value="correct">Los alumnos que tienen al menos una calificación > 90</option>
+                    <option value="wrong1">Los alumnos con promedio > 90</option>
+                    <option value="wrong2">Las materias con calificación > 90</option>
+                    <option value="wrong3">Los maestros que dieron calificaciones > 90</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>✏️ Completa las palabras clave (EXISTS, JOIN, AND):</label>
+                <input type="text" id="q3_fill1" placeholder="Palabra 1" style="width: 30%; margin-right: 10px;">
+                <input type="text" id="q3_fill2" placeholder="Palabra 2" style="width: 30%; margin-right: 10px;">
+                <input type="text" id="q3_fill3" placeholder="Palabra 3" style="width: 30%;">
+            </div>
+            <button onclick="checkExercise3()">✓ Verificar respuestas</button>
+            <div id="result3" class="result"></div>
+        </div>
+
+        <!-- Ejercicio 4: Análisis de resultado -->
+        <div class="query-section" id="exercise4">
+            <div class="query-title">
+                <span class="badge">Ejercicio 4</span>
+                Analizando resultados
+            </div>
+            <div class="sql-editor">
+                <pre>SELECT a.Matricula, a.Nombre, COUNT(i.InscripcionID) as TotalMaterias
+FROM Alumnos a
+LEFT JOIN Inscripciones i ON a.AlumnoID = i.AlumnoID
+GROUP BY a.Matricula, a.Nombre
+HAVING COUNT(i.InscripcionID) > 2</pre>
+            </div>
+            <div class="input-group">
+                <label>📌 ¿Qué muestra este query?</label>
+                <textarea id="q4_explain" rows="3" class="sql-code" placeholder="Explica con tus palabras qué hace esta consulta..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>💡 ¿Qué pasaría si cambiamos LEFT JOIN por INNER JOIN?</label>
+                <textarea id="q4_change" rows="3" class="sql-code" placeholder="Explica la diferencia..."></textarea>
+            </div>
+            <button onclick="checkExercise4()">✓ Verificar respuestas</button>
+            <div id="result4" class="result"></div>
+        </div>
+
+        <!-- Ejercicio 5: Crear tu propio query -->
+        <div class="query-section" id="exercise5">
+            <div class="query-title">
+                <span class="badge">Ejercicio 5</span>
+                ¡Manos a la obra!
+            </div>
+            <div class="input-group">
+                <label>🎯 Escribe un query que muestre: Los maestros que dan más de una materia</label>
+                <textarea id="q5_query" rows="5" class="sql-code" placeholder="Escribe tu consulta SQL aquí..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>📖 Explica cómo funciona tu query:</label>
+                <textarea id="q5_explain" rows="3" class="sql-code" placeholder="Explica paso a paso..."></textarea>
+            </div>
+            <button onclick="checkExercise5()">✓ Verificar respuesta</button>
+            <div id="result5" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de la base de datos escolar
+        const schoolData = {
+            Alumnos: [
+                { AlumnoID: 1, Nombre: "Juan Pérez", Matricula: "A2024001" },
+                { AlumnoID: 2, Nombre: "María López", Matricula: "A2024002" }
+            ],
+            Materias: [
+                { MateriaID: 1, NombreMateria: "Álgebra" },
+                { MateriaID: 2, NombreMateria: "Literatura" }
+            ],
+            Inscripciones: [
+                { AlumnoID: 1, CalificacionFinal: 85 },
+                { AlumnoID: 1, CalificacionFinal: 92 },
+                { AlumnoID: 2, CalificacionFinal: 78 }
+            ]
+        };
+
+        // Mostrar estructura de tablas
+        function displayTableStructure() {
+            const container = document.getElementById('tableStructure');
+            container.innerHTML = `
+                <div class="table-preview">
+                    <h4>📋 Alumnos</h4>
+                    <code>AlumnoID, Matricula, Nombre, Apellidos, FechaNacimiento, Email</code>
+                </div>
+                <div class="table-preview">
+                    <h4>👨‍🏫 Maestros</h4>
+                    <code>MaestroID, CodigoMaestro, Nombre, Especialidad, Email</code>
+                </div>
+                <div class="table-preview">
+                    <h4>📖 Materias</h4>
+                    <code>MateriaID, ClaveMateria, NombreMateria, Creditos</code>
+                </div>
+                <div class="table-preview">
+                    <h4>👥 Grupos</h4>
+                    <code>GrupoID, MateriaID, MaestroID, Grupo, CicloEscolar</code>
+                </div>
+                <div class="table-preview">
+                    <h4>✅ Inscripciones</h4>
+                    <code>InscripcionID, AlumnoID, GrupoID, CalificacionFinal, Estatus</code>
+                </div>
+                <div class="table-preview">
+                    <h4>📦 #products (temp)</h4>
+                    <code>Descripcion VARCHAR, Ventas INT</code>
+                </div>
+                <div class="table-preview">
+                    <h4>🔍 #datoAbuscar (temp)</h4>
+                    <code>dato VARCHAR(50)</code>
+                </div>
+            `;
+        }
+
+        // Mostrar datos de ejemplo
+        function displaySampleData() {
+            const container = document.getElementById('sampleData');
+            container.innerHTML = `
+                <div class="table-preview">
+                    <h4>📦 #products</h4>
+                    <table style="width:100%; font-size:11px;">
+                        <tr><th>Descripcion</th><th>Ventas</th></tr>
+                        <tr><td>A</td><td>12</td></tr>
+                        <tr><td>A</td><td>11</td></tr>
+                        <tr><td>C</td><td>10</td></tr>
+                        <tr><td>D</td><td>7</td></tr>
+                        <tr><td>E</td><td>5</td></tr>
+                        <tr><td>E</td><td>15</td></tr>
+                    </table>
+                </div>
+                <div class="table-preview">
+                    <h4>🔍 #datoAbuscar</h4>
+                    <table style="width:100%;">
+                        <tr><th>dato</th></tr>
+                        <tr><td>X</td></tr>
+                    </table>
+                    <p style="margin-top:5px; color:#666;">⚠️ La tabla contiene 'X', no coincide con ningún producto</p>
+                </div>
+            `;
+        }
+
+        // Verificar Ejercicio 1
+        function checkExercise1() {
+            const selectAnswer = document.getElementById('q1_select').value;
+            const fixQuery = document.getElementById('q1_fix').value.toLowerCase();
+            const resultDiv = document.getElementById('result1');
+            
+            let correctCount = 0;
+            let feedback = '';
+            
+            // Verificar selección
+            if (selectAnswer === 'correct') {
+                correctCount++;
+                feedback += '<div class="success">✅ Correcto: La consulta devuelve TODOS los productos porque la subconsulta siempre es verdadera (existe al menos un registro en #datoAbuscar)</div>';
+            } else if (selectAnswer === '') {
+                feedback += '<div class="error">❌ No has seleccionado una respuesta</div>';
+            } else {
+                feedback += '<div class="error">❌ Incorrecto. La consulta devuelve TODOS los productos porque EXISTS evalúa si la subconsulta devuelve filas, y como #datoAbuscar tiene datos, siempre es verdadero.</div>';
+            }
+            
+            // Verificar query corregido
+            const correctQuery = "select * from #products where exists(select 1 from #datoabuscar where dato = descripcion)";
+            if (fixQuery.includes('where exists') && (fixQuery.includes('dato = descripcion') || fixQuery.includes('descripcion = dato'))) {
+                correctCount++;
+                feedback += '<div class="success">✅ Excelente: Has corregido correctamente el query para buscar productos que coincidan con #datoAbuscar</div>';
+            } else if (fixQuery.length > 0) {
+                feedback += '<div class="error">❌ El query corregido no es correcto. Debes relacionar las tablas: WHERE EXISTS(SELECT 1 FROM #datoAbuscar WHERE dato = Descripcion)</div>';
+            } else {
+                feedback += '<div class="error">❌ No has escrito el query corregido</div>';
+            }
+            
+            resultDiv.innerHTML = feedback;
+        }
+
+        // Verificar Ejercicio 2
+        function checkExercise2() {
+            const explanation = document.getElementById('q2_explain').value;
+            const fill1 = document.getElementById('q2_fill1').value.toUpperCase();
+            const fill2 = document.getElementById('q2_fill2').value.toUpperCase();
+            const fill3 = document.getElementById('q2_fill3').value.toUpperCase();
+            const resultDiv = document.getElementById('result2');
+            
+            let feedback = '';
+            let correct = true;
+            
+            // Verificar joins
+            if (fill1 === 'INNER' && fill2 === 'INNER' && fill3 === 'INNER') {
+                feedback += '<div class="success">✅ Correcto: Los tres JOINs deben ser INNER porque necesitamos solo registros que tengan coincidencia en todas las tablas</div>';
+            } else {
+                correct = false;
+                feedback += '<div class="error">❌ Los JOINs deben ser INNER. Necesitamos solo alumnos que tengan inscripciones, grupos y materias relacionadas.</div>';
+            }
+            
+            // Verificar explicación
+            if (explanation.toLowerCase().includes('inner') && (explanation.toLowerCase().includes('coincidencia') || explanation.toLowerCase().includes('relación'))) {
+                feedback += '<div class="success">✅ Buena explicación sobre el uso de INNER JOIN</div>';
+            } else if (explanation.length > 0) {
+                feedback += '<div class="error">❌ Tu explicación debe mencionar que usamos INNER JOIN porque necesitamos solo los registros que tienen correspondencia en todas las tablas</div>';
+            } else {
+                feedback += '<div class="error">❌ No has proporcionado una explicación</div>';
+                correct = false;
+            }
+            
+            if (correct && fill1 === 'INNER' && fill2 === 'INNER' && fill3 === 'INNER') {
+                feedback = '<div class="success">🎉 ¡Perfecto! Has entendido correctamente el uso de INNER JOIN para relacionar tablas.</div>' + feedback;
+            }
+            
+            resultDiv.innerHTML = feedback;
+        }
+
+        // Verificar Ejercicio 3
+        function checkExercise3() {
+            const selectAnswer = document.getElementById('q3_select').value;
+            const fill1 = document.getElementById('q3_fill1').value.toUpperCase();
+            const fill2 = document.getElementById('q3_fill2').value.toUpperCase();
+            const fill3 = document.getElementById('q3_fill3').value.toUpperCase();
+            const resultDiv = document.getElementById('result3');
+            
+            let feedback = '';
+            let correctCount = 0;
+            
+            // Verificar selección
+            if (selectAnswer === 'correct') {
+                correctCount++;
+                feedback += '<div class="success">✅ Correcto: Devuelve los alumnos que tienen al menos una calificación mayor a 90</div>';
+            } else if (selectAnswer === '') {
+                feedback += '<div class="error">❌ No has seleccionado una respuesta</div>';
+            } else {
+                feedback += '<div class="error">❌ Incorrecto. EXISTS devuelve TRUE si existe al menos una calificación > 90 para ese alumno</div>';
+            }
+            
+            // Verificar palabras clave
+            if (fill1 === 'EXISTS' && fill2 === 'JOIN' && fill3 === 'AND') {
+                correctCount++;
+                feedback += '<div class="success">✅ Palabras clave correctas: EXISTS, JOIN, AND</div>';
+            } else {
+                feedback += '<div class="error">❌ Las palabras correctas son: EXISTS, JOIN, AND</div>';
+            }
+            
+            if (correctCount === 2) {
+                feedback = '<div class="success">🎉 ¡Excelente! Has completado correctamente el ejercicio de EXISTS</div>' + feedback;
+            }
+            
+            resultDiv.innerHTML = feedback;
+        }
+
+        // Verificar Ejercicio 4
+        function checkExercise4() {
+            const explanation = document.getElementById('q4_explain').value;
+            const changeExplain = document.getElementById('q4_change').value;
+            const resultDiv = document.getElementById('result4');
+            
+            let feedback = '';
+            
+            // Verificar explicación principal
+            if (explanation.toLowerCase().includes('alumnos') && 
+                (explanation.toLowerCase().includes('materias') || explanation.toLowerCase().includes('inscripciones')) &&
+                (explanation.toLowerCase().includes('mayor') || explanation.toLowerCase().includes('más de 2'))) {
+                feedback += '<div class="success">✅ Correcto: Muestra los alumnos que están inscritos en más de 2 materias (usando LEFT JOIN incluye alumnos sin materias)</div>';
+            } else if (explanation.length > 0) {
+                feedback += '<div class="error">❌ Tu explicación no es precisa. El query muestra alumnos con más de 2 materias inscritas (COUNT > 2)</div>';
+            } else {
+                feedback += '<div class="error">❌ No has explicado el query</div>';
+            }
+            
+            // Verificar diferencia LEFT vs INNER
+            if (changeExplain.toLowerCase().includes('left') && changeExplain.toLowerCase().includes('inner')) {
+                if (changeExplain.toLowerCase().includes('sin materias') || changeExplain.toLowerCase().includes('no tienen')) {
+                    feedback += '<div class="success">✅ Correcto: Con INNER JOIN solo se mostrarían alumnos con al menos una inscripción, LEFT JOIN incluye alumnos sin materias (pero no aparecerían por el HAVING)</div>';
+                } else {
+                    feedback += '<div class="error">❌ La diferencia principal es que LEFT JOIN incluye alumnos sin inscripciones (aunque el HAVING los filtraría)</div>';
+                }
+            } else if (changeExplain.length > 0) {
+                feedback += '<div class="error">❌ Debes explicar la diferencia entre LEFT JOIN e INNER JOIN en este contexto</div>';
+            } else {
+                feedback += '<div class="error">❌ No has explicado la diferencia</div>';
+            }
+            
+            resultDiv.innerHTML = feedback;
+        }
+
+        // Verificar Ejercicio 5
+        function checkExercise5() {
+            const query = document.getElementById('q5_query').value.toLowerCase();
+            const explanation = document.getElementById('q5_explain').value;
+            const resultDiv = document.getElementById('result5');
+            
+            let feedback = '';
+            
+            // Verificar query
+            const hasSelect = query.includes('select');
+            const hasFrom = query.includes('from');
+            const hasMaestros = query.includes('maestros');
+            const hasGroupBy = query.includes('group by');
+            const hasHaving = query.includes('having');
+            const hasCount = query.includes('count');
+            
+            if (hasSelect && hasFrom && hasMaestros && hasGroupBy && hasHaving && hasCount) {
+                feedback += '<div class="success">✅ ¡Excelente! Tu query tiene la estructura correcta para encontrar maestros con más de una materia</div>';
+                
+                // Sugerencia de query correcto
+                feedback += '<div class="success">💡 Un ejemplo de query correcto sería:<br><code>SELECT m.Nombre, COUNT(g.GrupoID) as TotalClases<br>FROM Maestros m<br>INNER JOIN Grupos g ON m.MaestroID = g.MaestroID<br>GROUP BY m.Nombre<br>HAVING COUNT(g.GrupoID) > 1</code></div>';
+            } else {
+                feedback += '<div class="error">❌ Tu query necesita: SELECT, FROM Maestros, GROUP BY, HAVING COUNT() > 1</div>';
+            }
+            
+            // Verificar explicación
+            if (explanation.length > 50) {
+                feedback += '<div class="success">✅ Buena explicación de tu query</div>';
+            } else if (explanation.length > 0) {
+                feedback += '<div class="error">❌ Tu explicación es muy corta, detalla más los pasos</div>';
+            } else {
+                feedback += '<div class="error">❌ No has explicado tu query</div>';
+            }
+            
+            resultDiv.innerHTML = feedback;
+        }
+
+        // Inicializar
+        displayTableStructure();
+        displaySampleData();
+    </script>
+</body>
+</html>
